@@ -1,0 +1,236 @@
+Name:Yousif Aqrawe
+Student ID: n10194606
+
+Name:Liam Brock
+Student ID:
+
+Please indicate for each question/task whether it is attempted/works/not attempted. 
+If you have attempted it but it doesn't run successfully select 'attempted', if it runs then select 'works', otherwise select 'not attempted.
+For Task 5 select either attempted/not attempted.
+
+--------
+Task 1
+Create database IF NOT EXISTS oktomook;
+
+USE oktomook;
+CREATE TABLE  Customers 
+(
+customerNumber int not null ,
+firstname VARCHAR(15) ,
+lastname VARCHAR(15) ,
+Address  VARCHAR(100) ,
+city varchar(15),
+State enum('QLD','SA','VIC','NSW','TAS','WA','NT','ACT') default null,
+postcode varchar(4) ,
+region CHAR(10),
+email VARCHAR(30),
+constraint PK_customer PRIMARY KEY (customerNumber)
+ );
+ 
+CREATE TABLE IF NOT EXISTs Books  
+(
+ISBN VARCHAR(13) NOT NULL ,
+title VARCHAR(30), 
+pubDate DATE, 
+PubID numeric (2), 
+Cost numeric (5,2), 
+Retail numeric (5,2), 
+Discount numeric (4,2), 
+category VARCHAR(12),
+CONSTRAINT PK_ISBN primary key (ISBN)
+);
+
+
+
+CREATE TABLE if not exists Orders
+
+(
+ orderNumber INT NOT NULL ,
+customerNumber INT auto_increment, 
+orderDate date , 
+shipDate date, 
+street VARCHAR (18),
+city varchar(15) , 
+state enum('QLD','SA','VIC','NSW','TAS','WA','NT','ACT') default null ,
+postCode varchar(4) DEFAULT NULL , 
+shipCost varchar (4) ,
+CONSTRAINT PK_oredernumber primary key (orderNumber), 
+FOREIGN KEY (customernumber) REFERENCES customers(customernumber)
+);
+ 
+
+
+create table OrderItems
+ (
+orderNumber int , 
+itemNumber int Auto_increment ,
+ISBN VARCHAR(13) , 
+quantity int , 
+paidEach int ,
+CONSTRAINT PK_ItemNumber primary key (itemNumber),
+FOREIGN KEY (orderNumber) REFERENCES Orders(orderNumber),
+FOREIGN KEY (ISBN) REFERENCES Books(ISBN)
+ );
+CREATE TABLE Author 
+ (
+authorID int not null,
+firstName VARCHAR(15),
+lastName VARCHAR(15),
+CONSTRAINT PK_authorid PRIMARY KEY(authorid)
+ );
+create table Wrote 
+(
+ISBN VARCHAR(13) , 
+authorID INT,
+foreign key (ISBN) references Books(ISBN),
+foreign key (authorid) references Author (authorid)
+);
+
+
+
+CREATE TABLE Publishers 
+(
+pubId varchar(2) not null, 
+Name VARCHAR(23) , 
+contact VARCHAR(15), 
+phone VARCHAR(12),
+CONSTRAINT PK_pubId PRIMARY KEY(pubId));
+
+
+--------
+Task 2
+--------
+Q1. 
+SELECT 
+	firstName, 
+    surname, 
+    studentID, 
+    email 
+FROM student 
+WHERE suburb LIKE '%Everton%'
+
+
+
+Q2.
+SELECT 
+	firstName, 
+	surname 
+FROM student WHERE buddyID IS NOT NULL
+ORDER BY surname ASC;
+
+Q3.
+select 
+	tutor.staffID,
+	tutor.firstName,
+    tutor.surname,
+    COUNT(unittutor.staffID) as number
+from 
+	tutor LEFT JOIN unittutor
+	ON tutor.staffID = unittutor.staffID
+GROUP BY tutor.staffID;
+
+Q4
+SELECT 
+	assignment.assignmentID,
+    assignment.assignmentName,
+    MIN(grade.grade) as min,
+    AVG(grade.grade) as avg,
+    MAX(grade.grade) as max
+FROM
+	assignment LEFT JOIN grade
+    ON assignment.assignmentID = grade.assignmentID
+GROUP BY assignment.assignmentID;
+    
+Q5.
+SELECT
+	tutor.firstName,
+    tutor.surname,
+    tutor.email,
+    unittutor.unitID,
+    unit.semester
+FROM
+	tutor INNER JOIN unittutor
+    ON tutor.staffID = unittutor.staffID
+    INNER JOIN unit
+    ON unittutor.unitID = unit.unitID
+WHERE NOT EXISTS (SELECT unit.semester FROM unit WHERE semester = 2)
+GROUP BY tutor.staffID;
+
+Q6.
+SELECT
+	student.studentID,
+	student.firstName,
+    student.surname,
+    grade.grade
+FROM
+	student LEFT JOIN sleeppatterns
+    ON student.studentID = sleeppatterns.studentID
+    INNER JOIN grade
+    ON sleeppatterns.studentID = grade.studentID
+WHERE MONTH(sleeppatterns.date) = '4'
+GROUP BY student.studentID
+HAVING AVG(sleeppatterns.timeAsleep) < 6
+
+--------
+Task 3
+--------
+Insert:
+Insert into Unit  ( unitName, unitCode, semester, year)
+
+values('Advanced Database Management' , 'IFB801',1, 2019);
+
+Delete:
+delete from phoneNumber where phoneNumber = '0262537777' and
+studentID = 1002;
+
+delete from phoneNumber where phoneNumber = '0245673338' and 
+studentID = 1005;
+Update:
+UPDATE student 
+
+set streetNumber = 72 , 
+streetName  = 'Evergreen Terrace' , 
+suburb= 'Springfield'
+
+where  studentID='1003';
+--------
+Task 4
+
+Create Index: 
+create index idx_assignment on assignment (assignmentName);
+Create View:
+CREATE VIEW  enrolments_view1 
+ 
+AS select  firstname, surname ,studentid  from student
+ where studentid not in(
+ select unitid from enrolments); 
+--------
+TAsk 5
+
+CREATE USER Nikki 
+IDENTIFIED BY 'secret';
+
+create user Jake
+ IDENTIFIED BY 'secret';
+
+grant insert 
+ON pulselearning.students
+ To Nikki;
+
+grant delete 
+ON pulselearning.students 
+To Nikki;
+
+grant insert 
+ON pulselearning.student
+ To Jake;
+revoke insert 
+ON pulselearning.students 
+from Jake;
+
+grant delete 
+ON pulselearning.student 
+To Jake;
+revoke delete
+ ON pulselearning.students
+ from Jake;
